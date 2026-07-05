@@ -35,7 +35,17 @@ For comparison, the official `anthropics/claude-plugins-official` ships the same
 - Release cadence and publishers are healthy: Playwright core team + Microsoft's release bot. Only known CVE (2025-9611, DNS rebinding) was fixed at 0.0.40 and doesn't apply to stdio transport.
 - 0.0.76/0.0.77 add real hardening over 0.0.75: path-traversal checks on static file serving, secrets redacted from console-log artifacts, data-URLs excluded from snapshots. File access is workspace-root-restricted and `file://` navigation blocked by default.
 - Verified by spawning 0.0.77 with this exact config: initializes cleanly, advertises 23 tools.
-- **Known sharp edge:** the default tool surface includes `browser_run_code_unsafe`, which executes Playwright-API JavaScript in a Node `vm` — escapable by design (upstream closed the RCE report by renaming the tool to say so). Same tool exists in 0.0.75, so this is not new exposure, and the realistic vector is prompt injection from a hostile page steering the agent into calling it. There is no CLI flag to disable individual tools; if you want it hard-off, add a Claude Code permission **deny** rule for that tool in the project's settings.
+- **Known sharp edge:** the default tool surface includes `browser_run_code_unsafe`, which executes Playwright-API JavaScript in a Node `vm` — escapable by design (upstream closed the RCE report by renaming the tool to say so). Same tool exists in 0.0.75, so this is not new exposure, and the realistic vector is prompt injection from a hostile page steering the agent into calling it. There is no CLI flag to disable individual tools; if you want it hard-off, add a Claude Code permission **deny** rule in the settings of each project that enables this plugin (plugins can't ship deny rules themselves):
+
+```json
+{
+  "permissions": {
+    "deny": ["mcp__plugin_playwright_playwright__browser_run_code_unsafe"]
+  }
+}
+```
+
+Verified 2026-07-05: with this rule the tool is removed from the session's toolset entirely — it doesn't merely fail at call time, and an `--allowedTools` grant cannot override it.
 
 ## Updating the pin
 
