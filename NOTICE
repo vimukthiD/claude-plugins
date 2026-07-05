@@ -1,0 +1,12 @@
+claude-plugins — personal Claude Code plugin marketplace
+Copyright 2026 Vimukthi (github.com/vimukthiD)
+
+This repository includes "feature-dev", vendored unmodified from
+Anthropic's claude-plugins-official repository
+(https://github.com/anthropics/claude-plugins-official)
+at commit 26db21ae4fa1748aaa74fc4c01d340aaac92f4f1.
+
+feature-dev is Copyright Anthropic, PBC, licensed under the Apache
+License, Version 2.0. Its original license text is retained at
+plugins/feature-dev/LICENSE. All credit for feature-dev belongs to
+its original authors at Anthropic.

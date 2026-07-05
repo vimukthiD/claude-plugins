@@ -30,6 +30,12 @@ Personal Claude Code plugin marketplace for vimukthiD. Public repo, closed contr
 
 Drop it under `plugins/<name>/` with its own `.claude-plugin/plugin.json`, then add an entry to `marketplace.json` with `"source": "./plugins/<name>"`.
 
+## License & attribution
+
+This repo is licensed under the [Apache License 2.0](LICENSE).
+
+`plugins/feature-dev/` is not my work: it is [Anthropic's feature-dev plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev), vendored **unmodified** from [`anthropics/claude-plugins-official`](https://github.com/anthropics/claude-plugins-official) at commit [`26db21ae`](https://github.com/anthropics/claude-plugins-official/tree/26db21ae4fa1748aaa74fc4c01d340aaac92f4f1/plugins/feature-dev). It is Copyright Anthropic, PBC, under Apache-2.0 — its original license is retained at [`plugins/feature-dev/LICENSE`](plugins/feature-dev/LICENSE), and full credit belongs to its original authors. See [NOTICE](NOTICE).
+
 ## Why this exists
 
 Full reasoning and setup history — including why plugins are pinned instead of vendored, why this is public with no collaborators, and the local machine lockdown that makes this the *only* marketplace this account will install from — lives in a local `HANDOFF.md` kept alongside this repo, not committed here.
