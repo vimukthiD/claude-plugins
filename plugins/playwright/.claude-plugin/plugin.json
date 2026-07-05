@@ -1,0 +1,9 @@
+{
+  "name": "playwright",
+  "version": "1.0.0",
+  "description": "Microsoft's Playwright browser-automation MCP server, pinned to @playwright/mcp 0.0.77 — headless isolated Chromium, screenshots to mcp/screenshots in the active project.",
+  "author": {
+    "name": "Vimukthi",
+    "url": "https://vimukthid.dev"
+  }
+}

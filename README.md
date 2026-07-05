@@ -21,6 +21,7 @@ The same commands work from a shell as `claude plugin marketplace add …` / `cl
 |---|---|---|---|
 | `feature-dev` | `/plugin install feature-dev@vimukthi-plugins` | Vendored from `anthropics/claude-plugins-official` at `26db21ae` | 7-phase feature-dev workflow. Vetted 2026-07-05: first-party Anthropic plugin, no hooks, no MCP server, subagents capped to read/web-only tools (no Bash/Write/Edit). |
 | `wikijs` | `/plugin install wikijs@vimukthi-plugins` | My own code, lives in this repo | MCP server for a self-hosted Wiki.js instance (8 page-management tools over GraphQL). Credentials are read from `~/.wikijs-mcp/config.json` or env vars on the local machine — never committed here. See [its README](plugins/wikijs/README.md). |
+| `playwright` | `claude plugin install playwright@vimukthi-plugins --scope project` | Wrapper around Microsoft's `@playwright/mcp`, pinned to `0.0.77` | Browser automation via headless isolated Chromium; meant for per-project activation. `npx`-fetched at first spawn (pinned, but no committed lockfile — see [its README](plugins/playwright/README.md)). |
 
 ## Updating a vendored plugin
 

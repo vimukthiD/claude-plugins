@@ -25,6 +25,17 @@
       "category": "productivity",
       "source": "./plugins/wikijs",
       "homepage": "https://github.com/vimukthiD/claude-plugins/tree/main/plugins/wikijs"
+    },
+    {
+      "name": "playwright",
+      "description": "Microsoft's Playwright MCP server, pinned to @playwright/mcp 0.0.77 with headless/isolated Chromium flags.",
+      "author": {
+        "name": "Vimukthi",
+        "url": "https://vimukthid.dev"
+      },
+      "category": "testing",
+      "source": "./plugins/playwright",
+      "homepage": "https://github.com/vimukthiD/claude-plugins/tree/main/plugins/playwright"
     }
   ]
 }
