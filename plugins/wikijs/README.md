@@ -46,6 +46,8 @@ npm run bundle
 
 Commit `src/` and `server/index.cjs` together — a bundle change without a matching source change (or vice versa) should fail review.
 
+Always bump `version` in `.claude-plugin/plugin.json` in the same commit: `claude plugin update` only refreshes an installed copy when the version changes, so a content change without a bump never reaches existing installs.
+
 ## Updating a dependency (deliberately)
 
 1. Edit the exact pin in `package.json`.
