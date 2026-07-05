@@ -1,7 +1,8 @@
 {
   "name": "vimukthi-plugins",
   "owner": {
-    "name": "Vimukthi"
+    "name": "Vimukthi",
+    "url": "https://vimukthid.dev"
   },
   "plugins": [
     {
@@ -13,6 +14,17 @@
       "category": "development",
       "source": "./plugins/feature-dev",
       "homepage": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev"
+    },
+    {
+      "name": "wikijs",
+      "description": "MCP server for Wiki.js — manage wiki pages via the Wiki.js GraphQL API.",
+      "author": {
+        "name": "Vimukthi",
+        "url": "https://vimukthid.dev"
+      },
+      "category": "productivity",
+      "source": "./plugins/wikijs",
+      "homepage": "https://github.com/vimukthiD/claude-plugins/tree/main/plugins/wikijs"
     }
   ]
 }

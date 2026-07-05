@@ -17,6 +17,7 @@ Personal Claude Code plugin marketplace for vimukthiD. Public repo, closed contr
 | Plugin | Source | Notes |
 |---|---|---|
 | `feature-dev` | Vendored from `anthropics/claude-plugins-official` at `26db21ae` | 7-phase feature-dev workflow. Vetted 2026-07-05: first-party Anthropic plugin, no hooks, no MCP server, subagents capped to read/web-only tools (no Bash/Write/Edit). |
+| `wikijs` | My own code, lives in this repo | MCP server for a self-hosted Wiki.js instance (8 page-management tools over GraphQL). Credentials are read from `~/.wikijs-mcp/config.json` or env vars on the local machine — never committed here. See [its README](plugins/wikijs/README.md). |
 
 ## Updating a vendored plugin
 

@@ -1,0 +1,9 @@
+{
+  "name": "wikijs",
+  "version": "1.0.0",
+  "description": "MCP server for Wiki.js — list, read, search, create, update, and delete wiki pages via the Wiki.js GraphQL API.",
+  "author": {
+    "name": "Vimukthi",
+    "url": "https://vimukthid.dev"
+  }
+}
