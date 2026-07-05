@@ -14,7 +14,11 @@ claude plugin install playwright@vimukthi-plugins --scope project
 
 (`--scope local` to keep it out of the project's committed settings; omit the flag for global. Requires the `vimukthiD/claude-plugins` marketplace — see the [repo README](../../README.md).)
 
-First run on a machine may need the Chromium binary: `npx playwright install chromium`.
+First run on a machine may need the browser binary (verified on 0.0.77, which wants the chrome-for-testing headless shell):
+
+```bash
+npx -y @playwright/mcp@0.0.77 install-browser chrome-for-testing
+```
 
 ## Supply-chain posture
 
