@@ -1,0 +1,24 @@
+{
+  "name": "vimukthi-plugins",
+  "owner": {
+    "name": "Vimukthi"
+  },
+  "plugins": [
+    {
+      "name": "feature-dev",
+      "description": "Anthropic's feature-dev workflow plugin. Pinned copy, reviewed before each update.",
+      "author": {
+        "name": "Anthropic"
+      },
+      "category": "development",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-plugins-official.git",
+        "path": "plugins/feature-dev",
+        "ref": "main",
+        "sha": "26db21ae4fa1748aaa74fc4c01d340aaac92f4f1"
+      },
+      "homepage": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/feature-dev"
+    }
+  ]
+}

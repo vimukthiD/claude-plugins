@@ -1,0 +1,4 @@
+# Local machine config and setup notes, not marketplace content —
+# the template gets copied to the OS managed-settings path, it isn't served by the marketplace.
+managed-settings.template.json
+HANDOFF.md
