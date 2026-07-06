@@ -15,6 +15,16 @@ Personal Claude Code plugin marketplace for vimukthiD. Public repo, closed contr
 
 The same commands work from a shell as `claude plugin marketplace add …` / `claude plugin install …` (add `--scope project` to enable a plugin only in the current project).
 
+### Invoking plugin commands
+
+Plugin slash commands are always namespaced as `/<plugin-name>:<command-name>` — bare command names don't resolve (by design; [anthropics/claude-code#15882](https://github.com/anthropics/claude-code/issues/15882), closed as not-planned). So feature-dev's workflow command is:
+
+```
+/feature-dev:feature-dev Add user authentication with OAuth
+```
+
+The name doubles because the plugin and its one command share the name `feature-dev`. Upstream's own README shows bare `/feature-dev …`, which predates mandatory namespacing — typing `/fea` and picking the autocomplete entry does the right thing.
+
 ## What's in here
 
 | Plugin | Install | Source | Notes |
