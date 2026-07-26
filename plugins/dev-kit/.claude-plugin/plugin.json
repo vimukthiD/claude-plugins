@@ -1,0 +1,9 @@
+{
+  "name": "dev-kit",
+  "version": "1.0.0",
+  "description": "Cost-aware development agents: a read-only architect on the premium tier, a Sonnet builder, and Haiku scout/operator agents for discovery and ops. Includes a transcript cost auditor.",
+  "author": {
+    "name": "Vimukthi",
+    "url": "https://vimukthid.dev"
+  }
+}

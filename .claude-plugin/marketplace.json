@@ -27,6 +27,17 @@
       "homepage": "https://github.com/vimukthiD/claude-plugins/tree/main/plugins/wikijs"
     },
     {
+      "name": "dev-kit",
+      "description": "Task-routed development agents on explicitly pinned models: read-only architect on Fable 5, builder on Opus 5, operator on Sonnet 5, scout on Haiku 4.5. Agents and commands only, no hooks or MCP server.",
+      "author": {
+        "name": "Vimukthi",
+        "url": "https://vimukthid.dev"
+      },
+      "category": "development",
+      "source": "./plugins/dev-kit",
+      "homepage": "https://github.com/vimukthiD/claude-plugins/tree/main/plugins/dev-kit"
+    },
+    {
       "name": "playwright",
       "description": "Microsoft's Playwright MCP server, pinned to @playwright/mcp 0.0.77 with headless/isolated Chromium flags.",
       "author": {
