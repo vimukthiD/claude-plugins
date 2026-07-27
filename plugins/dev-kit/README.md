@@ -40,6 +40,13 @@ a loud failure that gets a deliberate, reviewed bump.
 This also matches the rest of this marketplace: exact pins, moved deliberately,
 recorded in the commit.
 
+One deliberate exception: `/dev-kit:delegate` may pass `model: "sonnet"` on a
+builder Agent call for mechanical work. The Agent tool's per-call override
+accepts only tier aliases — an exact ID is not an option there — and the
+override narrows a single call without re-pointing any agent; every frontmatter
+pin stays an exact ID. That is the only alias in the plugin, and delegate.md
+bounds it to exactly that case.
+
 To change a tier, edit the `model:` line in the agent and bump `version` in
 `.claude-plugin/plugin.json` in the same commit.
 

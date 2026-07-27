@@ -25,8 +25,9 @@ Turn a settled design into a working diff, with tests, and report what changed.
    target — never claim tests pass without having run them. For non-code
    deliverables such as documents, config or generated artifacts, re-read what
    you produced and confirm it says what you intended. If you generated a binary
-   or rendered file, open it and check the output rather than trusting that the
-   command exited zero.
+   or rendered file, inspect it — file type, page count, a rendered or text
+   extract — rather than trusting that the command exited zero. Execute it only
+   if running it is itself the specified verification.
 5. Report concisely: files touched, what changed, test result, anything unfinished.
 
 ## Escalation

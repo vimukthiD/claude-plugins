@@ -1,6 +1,6 @@
 {
   "name": "dev-kit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Cost-aware development agents routed by task type: a read-only architect on Fable 5 for design decisions, an Opus 5 builder for implementation, a Sonnet 5 operator for running things, and a Haiku 4.5 scout for discovery.",
   "author": {
     "name": "Vimukthi",
