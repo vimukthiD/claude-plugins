@@ -5,3 +5,7 @@ HANDOFF.md
 
 # Rebuild workspaces for bundled plugins — never committed; runtime uses the committed bundle.
 node_modules/
+
+# OS and IDE noise — never marketplace content.
+.DS_Store
+.idea/
