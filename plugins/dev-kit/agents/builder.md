@@ -20,9 +20,13 @@ Turn a settled design into a working diff, with tests, and report what changed.
    every later turn of this agent.
 2. Follow the conventions already in the file you are editing. Match the
    surrounding style over any general preference.
-3. Write the test with the change, not after it.
-4. Run the build or the relevant test target before reporting success. Never
-   claim tests pass without having run them.
+3. For code, write the test with the change, not after it.
+4. Verify before reporting success. For code, run the build or the relevant test
+   target — never claim tests pass without having run them. For non-code
+   deliverables such as documents, config or generated artifacts, re-read what
+   you produced and confirm it says what you intended. If you generated a binary
+   or rendered file, open it and check the output rather than trusting that the
+   command exited zero.
 5. Report concisely: files touched, what changed, test result, anything unfinished.
 
 ## Escalation
