@@ -85,10 +85,12 @@ quiet one. A wrong "not found" does not fail loudly — it feeds a bad premise t
 an architect running at `max`, and one avoided round-trip there outweighs years
 of the difference in scout tokens.
 
-The operator stays at `low` deliberately. Its job is mechanical: run, filter,
-report, hand back. More reasoning there does not make it better at that, it
-makes it likelier to theorise past its brief — and it is the one agent with
-unrestricted `Bash`, including against remote hosts.
+The operator sits at `medium`. Its job is mostly mechanical — run, filter,
+report, hand back — which argues for `low`; but it also has to interpret
+failures and decide which lines of output matter, and a wrong reading of a test
+run or deploy check feeds bad state back to the caller. `medium` buys that
+interpretation without inviting it to theorise far past its brief — a real risk
+for the one agent with unrestricted `Bash`, including against remote hosts.
 
 ### If the scout proves unreliable
 
@@ -108,7 +110,7 @@ that over climbing the effort ladder on Haiku. Bump `version` in the same commit
 
 | Command                           | Does                                                            |
 |-----------------------------------|-----------------------------------------------------------------|
-| `/dev-kit:delegate <task>`        | Splits the task and routes each part to the right agent         |
+| `/dev-kit:delegate <task>`        | Triages the task: trivial edits to known files stay inline, everything else is split and routed |
 | `/dev-kit:adr [label] <question>` | Scout locates the code, architect decides, the ADR gets written |
 
 Commands are always namespaced — `/dev-kit:delegate`, not `/delegate`.
@@ -155,7 +157,10 @@ fills. Name the agent when it matters.
 
 ### `/dev-kit:delegate`
 
-Give it the whole task and let it split and route:
+Give it the whole task. A trivial, fully-specified edit to an already-known
+file is handled inline — delegation overhead is never recovered on a two-line
+change. Anything needing discovery, real implementation, or execution is split
+and routed:
 
 ```
 /dev-kit:delegate the lifecycle job is skipping licenses whose customer was
@@ -200,8 +205,12 @@ Good:  dev-kit:builder — add a non-negative check on limitValue in
        Add a case to EntitlementDtosTest.
 ```
 
-Name the files; let the agent read them. Anything you read on the main thread to
-"help" is paid for again on every later turn there.
+Name the files; let the agent read them — do not paste file bodies. But put
+what you already know into the brief: the constraints, the tooling the repo
+already has, the approaches already ruled out. A subagent starts from a clean
+context, so whatever the brief withholds it must rediscover at full price — and
+may rediscover badly. Re-sent main-thread context bills at roughly a tenth of
+input price under prompt caching; a subagent's cold start does not.
 
 ### Sequencing
 
