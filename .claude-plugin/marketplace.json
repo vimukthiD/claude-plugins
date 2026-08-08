@@ -39,7 +39,7 @@
     },
     {
       "name": "playwright",
-      "description": "Microsoft's Playwright MCP server, pinned to @playwright/mcp 0.0.77 with headless/isolated Chromium flags.",
+      "description": "Microsoft's Playwright MCP server, pinned to @playwright/mcp 0.0.79 with headless/isolated Chromium flags.",
       "author": {
         "name": "Vimukthi",
         "url": "https://vimukthid.dev"
