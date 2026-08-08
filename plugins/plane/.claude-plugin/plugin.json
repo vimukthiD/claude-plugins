@@ -1,0 +1,9 @@
+{
+  "name": "plane",
+  "version": "1.0.0",
+  "description": "Plane project-management MCP server, pinned to makeplane/plane-mcp-server@sha256:1feb49a9 (v0.2.11) and run as a hardened rootless container. Workspace and credentials come from the environment; ships deny profiles because 92 of its 177 tools are unusable on Plane Community.",
+  "author": {
+    "name": "Vimukthi",
+    "url": "https://vimukthid.dev"
+  }
+}
