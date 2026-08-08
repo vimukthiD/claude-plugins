@@ -50,7 +50,7 @@
     },
     {
       "name": "plane",
-      "description": "Plane's official MCP server, pinned by image digest (v0.2.11) and run as a hardened rootless container. Requires Plane 1.4.1+; workspace and token come from the environment.",
+      "description": "Plane's official MCP server, pinned by image digest (v0.2.11) and run as a hardened rootless container. Requires Plane 1.4.1+; token from ~/.plane-mcp/env, workspace from a per-project .plane-workspace file.",
       "author": {
         "name": "Vimukthi",
         "url": "https://vimukthid.dev"

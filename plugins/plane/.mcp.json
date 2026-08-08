@@ -2,28 +2,8 @@
   "mcpServers": {
     "plane": {
       "type": "stdio",
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "--user",
-        "65534:65534",
-        "--read-only",
-        "-e",
-        "PLANE_API_KEY",
-        "-e",
-        "PLANE_WORKSPACE_SLUG",
-        "-e",
-        "PLANE_BASE_URL",
-        "makeplane/plane-mcp-server@sha256:1feb49a963de0e3e3a2178cd86c4b388c19ef7fddfd15a95f81f6bd71cb7a95e",
-        "stdio"
-      ],
-      "env": {
-        "PLANE_API_KEY": "${PLANE_API_KEY}",
-        "PLANE_WORKSPACE_SLUG": "${PLANE_WORKSPACE_SLUG}",
-        "PLANE_BASE_URL": "${PLANE_BASE_URL}"
-      }
+      "command": "sh",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/bin/plane-mcp"]
     }
   }
 }

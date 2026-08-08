@@ -22,14 +22,14 @@ claude plugin install plane@vimukthi-plugins --scope project
 
 Then do both of the following. Neither is optional:
 
-1. [Configure credentials and workspace](#configuration) — the server starts without them and fails confusingly.
+1. [Configure credentials and workspace](#configuration) — one 600-mode file, no shell-profile edits.
 2. [Apply a deny profile](#deny-profiles) — plugins cannot ship deny rules, so an unconfigured install exposes all 177 tools including 13 live `delete_*` tools.
 
 ## Configuration
 
-Three environment variables, all read from the environment at spawn time. Nothing is committed here.
+Three settings, resolved by the plugin's own launcher (`bin/plane-mcp`) rather than by `${VAR}` expansion — so **no shell-profile edits are needed**. Nothing is committed here.
 
-| Variable | Required | Value |
+| Setting | Required | Value |
 |---|---|---|
 | `PLANE_API_KEY` | yes | Personal access token |
 | `PLANE_WORKSPACE_SLUG` | yes | The workspace this project works against |
@@ -37,21 +37,37 @@ Three environment variables, all read from the environment at spawn time. Nothin
 
 `PLANE_BASE_URL` is the bare origin. The SDK appends `/api/v1` itself; adding it yourself produces 404s on every call.
 
+**Precedence, highest first:**
+
+1. **Inherited environment** — explicit always wins, including an `env` block on a server entry.
+2. **`./.plane-workspace`** — project-local file, slug only. Plugin MCP servers are spawned with the project directory as cwd, so this is the project's own declaration.
+3. **`~/.plane-mcp/env`** — machine-wide defaults, `KEY=value` lines. Override the path with `PLANE_MCP_CONFIG`.
+
+Missing config is a hard error at spawn (`exit 78`) naming the variables, not a malformed URL at the first tool call.
+
 ### Getting a token
 
 Profile settings → **Personal Access Tokens** → **Add personal access token** (`https://<your-plane>/profile/api-tokens`). Set an expiry. The token is shown once.
 
 A PAT inherits the full permissions of the account that created it — there is no scoping and no read-only flag. Since this server's tool surface includes `delete_project`, consider generating the token from a dedicated Plane user invited as **Member** rather than Admin. Member cannot delete projects or the workspace, which caps the blast radius independently of the deny profile.
 
-### Storing credentials
+### Machine setup (once)
 
-The token is machine-local and never belongs in a repo. Keep it outside:
+The token is machine-local and never belongs in a repo. One file, mode 600 — no shell rc changes:
 
 ```bash
 mkdir -p ~/.plane-mcp && chmod 700 ~/.plane-mcp
-printf 'PLANE_API_KEY=%s\n' 'plane_api_xxx' > ~/.plane-mcp/env
+cat > ~/.plane-mcp/env <<'EOF'
+PLANE_API_KEY=plane_api_xxx
+PLANE_BASE_URL=https://plane.example.com
+PLANE_WORKSPACE_SLUG=your-default-workspace
+EOF
 chmod 600 ~/.plane-mcp/env
 ```
+
+The launcher warns on stderr if this file is not mode 600, since it holds an API token.
+
+`PLANE_WORKSPACE_SLUG` here is a **fallback default**. Leave it out entirely if you would rather a project without an explicit workspace fail loudly than quietly operate on the wrong one.
 
 ### Setting the workspace (per project)
 
@@ -59,13 +75,13 @@ chmod 600 ~/.plane-mcp/env
 
 A PAT works across every workspace its account belongs to, so **only the slug changes between projects**, never the token.
 
-Per project, via [direnv](https://direnv.net) `.envrc`, a shell profile, or however you already manage per-project env:
+Declare it in the project root:
 
 ```bash
-source ~/.plane-mcp/env                       # PLANE_API_KEY — shared
-export PLANE_WORKSPACE_SLUG=this-projects-workspace
-export PLANE_BASE_URL=https://plane.example.com
+echo your-workspace-slug > .plane-workspace
 ```
+
+That is the whole mechanism — no direnv, no shell hook, no per-project exports. The slug is not a secret, so committing `.plane-workspace` is fine and makes the workspace travel with the repo. An empty or whitespace-only file is ignored and falls through to the machine default.
 
 Find the slug in the Plane URL — it is the segment right after the host:
 
@@ -77,29 +93,22 @@ The REST API has no list-workspaces endpoint, so the URL is the reliable source.
 
 ### Switching workspace
 
-Change `PLANE_WORKSPACE_SLUG` in the shell, then **restart Claude Code**. `/reload-plugins` is not enough: it respawns the MCP server, but the `docker` process inherits the environment Claude Code captured at *its* launch, so a variable changed afterwards is invisible until the whole session restarts.
+Edit `.plane-workspace`, then **restart Claude Code**. `/reload-plugins` is not enough: it respawns the MCP server, but the launcher reads config at spawn under the environment Claude Code captured at *its* own launch, so nothing short of a session restart is guaranteed to pick up a change.
 
-**`env` in `settings.json` does not work for these variables.** `${VAR}` references in `.mcp.json` are resolved against the real process environment only — a `settings.json` `env` block is not consulted, and the symptom is the [literal-passthrough failure](#troubleshooting) below. Verified 2026-08-08.
+**`env` in `settings.json` does not supply these values.** It is not consulted for `${VAR}` expansion in `.mcp.json`, and it is not the launcher's config file either. Use `~/.plane-mcp/env` or `.plane-workspace`. Verified 2026-08-08.
 
 ### Serving several workspaces at once
 
-Only worth it if you genuinely need cross-workspace work in a single session. Add a second server entry locally — in the project's `.mcp.json`, not in this plugin — with a distinct server name and a hardcoded slug:
+Only worth it if you genuinely need cross-workspace work in a single session. Add a second server entry locally — in the project's `.mcp.json`, not in this plugin — reusing this plugin's launcher and pinning the other workspace via its `env` block. An inherited environment value outranks both `.plane-workspace` and the config file, which is exactly what makes this work:
 
 ```json
 {
   "mcpServers": {
     "plane-other": {
       "type": "stdio",
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "--user", "65534:65534", "--read-only",
-               "-e", "PLANE_API_KEY", "-e", "PLANE_BASE_URL",
-               "makeplane/plane-mcp-server@sha256:1feb49a963de0e3e3a2178cd86c4b388c19ef7fddfd15a95f81f6bd71cb7a95e",
-               "stdio"],
-      "env": {
-        "PLANE_API_KEY": "${PLANE_API_KEY}",
-        "PLANE_WORKSPACE_SLUG": "the-other-workspace",
-        "PLANE_BASE_URL": "${PLANE_BASE_URL}"
-      }
+      "command": "sh",
+      "args": ["/absolute/path/to/plugins/plane/bin/plane-mcp"],
+      "env": { "PLANE_WORKSPACE_SLUG": "the-other-workspace" }
     }
   }
 }
@@ -192,6 +201,7 @@ Verified against a live self-hosted Plane 1.4.1 Community instance with a real t
 
 - Image pulled by digest; `docker run -i --rm --user 65534:65534 --read-only … stdio` initializes cleanly on protocol `2025-06-18` and advertises 177 tools.
 - Interior: Python 3.11.15, `plane-mcp-server` 0.2.11, `plane-sdk` 0.2.20, 310 MB.
+- `bin/plane-mcp` (the only first-party code here, POSIX `sh`) verified with zero `PLANE_*` variables exported: config read from `~/.plane-mcp/env`, a real agent call through Claude Code returned live project data. Precedence checked case by case — config file alone, `.plane-workspace` overriding it, `env` overriding both, and an empty `.plane-workspace` correctly ignored. Missing config exits 78 before the container starts.
 - End-to-end confirmed: `list_projects` through the container returns real project data. `--network none` correctly breaks it, proving the hardening flags take effect.
 - Read-only sweep of 39 probeable tools: 19 work, 20 return 404. No write or delete tool was invoked.
 - **Sharp edge — tool-surface drift.** v0.2.10 → v0.2.11 added **38 tools and removed none**, including 6 new `delete_*`, in a patch release. A digest bump can silently widen the surface, and a deny profile written by exclusion goes stale in the dangerous direction. Re-diff the tool list on every bump, not just the changelog.
@@ -214,9 +224,17 @@ Verified against a live self-hosted Plane 1.4.1 Community instance with a real t
 
 ## Troubleshooting
 
-**Every call fails with `MissingSchema: Invalid URL '${PLANE_BASE_URL}/api/v1/...'`** — the environment variables are not set in the shell that launched Claude Code. Unset `${VAR}` references are passed through **literally**, so the container starts and the tools appear; only the first call fails. Check with `echo $PLANE_WORKSPACE_SLUG` in the same shell, then restart the session.
+**The server fails to start, `plane-mcp: missing required config: …`** — the launcher found none of that variable in the environment, `.plane-workspace`, or the config file. It names exactly what is missing and exits 78. Reproduce outside Claude Code to see it directly:
 
-The same error appears if you tried to supply the variables through an `env` block in `settings.json` — that channel is not consulted for `.mcp.json` expansion. They must be exported in the shell that launches Claude Code.
+```bash
+sh <plugin-root>/bin/plane-mcp < /dev/null
+```
+
+Common causes: the config file is somewhere other than `~/.plane-mcp/env` (point `PLANE_MCP_CONFIG` at it), or the file exists but uses `export KEY=value` with stray quoting — plain `KEY=value` lines are what it expects.
+
+**`plane-mcp: config contains a literal ${...} placeholder`** — something passed an unexpanded `${VAR}` through, usually an `env` block on a server entry referencing a variable that is not exported. Drop the `env` block and let the config file supply it.
+
+**Tools appear but every call fails with `MissingSchema: Invalid URL '${PLANE_BASE_URL}/api/v1/...'`** — this is the pre-1.1.0 failure mode, from when `.mcp.json` used `${VAR}` expansion directly. If you see it now, an installed copy is older than the launcher; run `claude plugin update plane@vimukthi-plugins`.
 
 **`HTTP 403: Given API token is not valid`** — token is wrong, expired, or revoked. Confirm with:
 

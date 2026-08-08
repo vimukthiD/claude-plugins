@@ -1,0 +1,86 @@
+#!/bin/sh
+# Resolve Plane MCP config, then exec the pinned upstream container over stdio.
+#
+# Exists so that using this plugin needs no shell-profile edits: `${VAR}`
+# expansion in .mcp.json reads only the real process environment, which means
+# every consumer would otherwise have to export three variables from their
+# shell rc. This reads them from a file instead.
+#
+# Config precedence, highest first:
+#   1. inherited environment       explicit always wins, incl. an env block in .mcp.json
+#   2. ./.plane-workspace          project-local, slug only (cwd is the project)
+#   3. $PLANE_MCP_CONFIG           defaults to ~/.plane-mcp/env, "KEY=value" lines
+#
+# Unset config is a hard error here, not a malformed URL at first tool call.
+
+IMAGE="makeplane/plane-mcp-server@sha256:1feb49a963de0e3e3a2178cd86c4b388c19ef7fddfd15a95f81f6bd71cb7a95e"
+CONF="${PLANE_MCP_CONFIG:-$HOME/.plane-mcp/env}"
+
+# Keep whatever the environment already provided; the file only fills blanks.
+env_key="$PLANE_API_KEY"
+env_slug="$PLANE_WORKSPACE_SLUG"
+env_url="$PLANE_BASE_URL"
+
+if [ -f "$CONF" ]; then
+    case "$(ls -l "$CONF" | cut -c1-10)" in
+        -rw-------) ;;
+        *) echo "plane-mcp: warning: $CONF is not mode 600; it holds an API token" >&2 ;;
+    esac
+    set -a
+    # shellcheck disable=SC1090
+    . "$CONF"
+    set +a
+fi
+
+# A project-local slug beats the machine-wide config file. Plugin MCP servers
+# are spawned with the project directory as cwd, so this is the active project's
+# own declaration of which workspace it belongs to.
+if [ -f .plane-workspace ]; then
+    slug="$(tr -d '[:space:]' < .plane-workspace)"
+    if [ -n "$slug" ]; then
+        PLANE_WORKSPACE_SLUG="$slug"
+    fi
+fi
+
+# An explicitly inherited environment beats everything, so a second server
+# entry can pin a different workspace via its own env block.
+if [ -n "$env_key" ];  then PLANE_API_KEY="$env_key"; fi
+if [ -n "$env_slug" ]; then PLANE_WORKSPACE_SLUG="$env_slug"; fi
+if [ -n "$env_url" ];  then PLANE_BASE_URL="$env_url"; fi
+
+export PLANE_API_KEY PLANE_WORKSPACE_SLUG PLANE_BASE_URL
+
+missing=""
+[ -n "$PLANE_API_KEY" ]        || missing="$missing PLANE_API_KEY"
+[ -n "$PLANE_WORKSPACE_SLUG" ] || missing="$missing PLANE_WORKSPACE_SLUG"
+[ -n "$PLANE_BASE_URL" ]       || missing="$missing PLANE_BASE_URL"
+
+if [ -n "$missing" ]; then
+    echo "plane-mcp: missing required config:$missing" >&2
+    echo "plane-mcp: expected KEY=value lines in $CONF (chmod 600), or exported in the environment." >&2
+    echo "plane-mcp: PLANE_WORKSPACE_SLUG may also come from a .plane-workspace file in the project root." >&2
+    echo "plane-mcp: PLANE_BASE_URL is the origin only, e.g. https://plane.example.com (no /api/v1)." >&2
+    exit 78  # EX_CONFIG
+fi
+
+# Catch a config file that was filled in with the placeholders still in it.
+case "$PLANE_BASE_URL$PLANE_WORKSPACE_SLUG$PLANE_API_KEY" in
+    *'${'*)
+        echo "plane-mcp: config contains a literal \${...} placeholder — an unexpanded variable was passed through." >&2
+        exit 78
+        ;;
+esac
+
+if ! command -v docker >/dev/null 2>&1; then
+    echo "plane-mcp: docker not found on PATH; this plugin runs the upstream image." >&2
+    exit 127
+fi
+
+exec docker run -i --rm \
+    --user 65534:65534 \
+    --read-only \
+    -e PLANE_API_KEY \
+    -e PLANE_WORKSPACE_SLUG \
+    -e PLANE_BASE_URL \
+    "$IMAGE" \
+    stdio
