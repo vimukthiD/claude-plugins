@@ -77,7 +77,9 @@ The REST API has no list-workspaces endpoint, so the URL is the reliable source.
 
 ### Switching workspace
 
-Change `PLANE_WORKSPACE_SLUG` and restart the session (or `/reload-plugins`). The value is read when the container spawns, so an edit mid-session has no effect until the server restarts.
+Change `PLANE_WORKSPACE_SLUG` in the shell, then **restart Claude Code**. `/reload-plugins` is not enough: it respawns the MCP server, but the `docker` process inherits the environment Claude Code captured at *its* launch, so a variable changed afterwards is invisible until the whole session restarts.
+
+**`env` in `settings.json` does not work for these variables.** `${VAR}` references in `.mcp.json` are resolved against the real process environment only — a `settings.json` `env` block is not consulted, and the symptom is the [literal-passthrough failure](#troubleshooting) below. Verified 2026-08-08.
 
 ### Serving several workspaces at once
 
@@ -213,6 +215,8 @@ Verified against a live self-hosted Plane 1.4.1 Community instance with a real t
 ## Troubleshooting
 
 **Every call fails with `MissingSchema: Invalid URL '${PLANE_BASE_URL}/api/v1/...'`** — the environment variables are not set in the shell that launched Claude Code. Unset `${VAR}` references are passed through **literally**, so the container starts and the tools appear; only the first call fails. Check with `echo $PLANE_WORKSPACE_SLUG` in the same shell, then restart the session.
+
+The same error appears if you tried to supply the variables through an `env` block in `settings.json` — that channel is not consulted for `.mcp.json` expansion. They must be exported in the shell that launches Claude Code.
 
 **`HTTP 403: Given API token is not valid`** — token is wrong, expired, or revoked. Confirm with:
 
